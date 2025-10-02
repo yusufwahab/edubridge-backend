@@ -1,25 +1,29 @@
 import express from 'express';
-import dotenv from 'dotenv'
+import dotenv from 'dotenv';
+import cors from 'cors'; // 1. Import the cors package
 import { connectDB } from './db.js';
-dotenv.config();
 import authRoutes from './routes/auth.js';
 
-
+dotenv.config();
 
 const PORT = process.env.PORT || 5000;
 
-const app = express()
+const app = express();
 
+// --- Middleware ---
 app.use(express.json());
 
-app.use("/api/user", authRoutes)
+// 2. Add the CORS middleware to allow all origins.
+// This must come before your routes to process the request first.
+app.use(cors()); 
 
-// app.get('/', (req, res) => {
-//   res.send('Hello from Node API server cleaned!')
-// });
+// --- Routes ---
+app.use("/api/user", authRoutes);
 
+
+// --- Database Connection and Server Start ---
 connectDB();
 
- app.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`Server is running on PORT ${PORT}`);
 });
