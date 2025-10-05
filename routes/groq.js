@@ -1,35 +1,25 @@
 // routes/groq.js
 import express from "express";
-import fetch from "node-fetch";
 import { protect } from "../middleware/auth.js"; // optional: only allow logged-in users
 
 const router = express.Router();
 
-router.post("/groq", protect, async (req, res) => {
+// ✅ best practice: route path should be relative (no "/api" prefix here)
+router.get("/key", protect, async (req, res) => {
   try {
-    const { messages } = req.body;
+    const apiKey = process.env.GROQ_API_KEY;
 
-    if (!messages) {
-      return res.status(400).json({ error: "Messages are required" });
+    if (!apiKey) {
+      return res.status(500).json({ error: "API key not found in environment variables" });
     }
 
-    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "llama-3.3-70b-versatile", // or whichever Groq model you prefer
-        messages,
-      }),
-    });
+    // ✅ mask all but the last 4 characters
+    const maskedKey = apiKey.replace(/.(?=.{4})/g, "*");
 
-    const data = await response.json();
-    res.status(200).json(data);
-  } catch (error) {
-    console.error("Groq API error:", error.message);
-    res.status(500).json({ error: "Failed to fetch response from Groq" });
+    res.json({ key: maskedKey });
+  } catch (err) {
+    console.error("Error fetching GROQ API key:", err);
+    res.status(500).json({ error: "Server error fetching API key" });
   }
 });
 
