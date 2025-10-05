@@ -1,11 +1,11 @@
 // routes/groq.js
 import express from "express";
-import { protect } from "../middleware/auth.js"; // optional: only allow logged-in users
+ // optional: only allow logged-in users
 
 const router = express.Router();
 
 // ✅ best practice: route path should be relative (no "/api" prefix here)
-router.get("/key", protect, async (req, res) => {
+router.get("/key", async (req, res) => {
   try {
     const apiKey = process.env.GROQ_API_KEY;
 
