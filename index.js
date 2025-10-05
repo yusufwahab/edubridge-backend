@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import cors from 'cors'; // 1. Import the cors package
 import { connectDB } from './db.js';
 import authRoutes from './routes/auth.js';
+import groqRoutes from './routes/groq.js'
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ app.use(cors());
 
 // --- Routes ---
 app.use("/api/user", authRoutes);
+app.use("/api", groqRoutes);
 
 
 // --- Database Connection and Server Start ---
