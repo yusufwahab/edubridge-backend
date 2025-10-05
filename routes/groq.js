@@ -1,11 +1,11 @@
 // routes/groq.js
 import express from "express";
- // optional: only allow logged-in users
+import { protect } from "../middleware/auth.js"; // optional: only allow logged-in users
 
 const router = express.Router();
 
-// ✅ best practice: route path should be relative (no "/api" prefix here)
-router.get("/key", async (req, res) => {
+// Best practice: no "/api" prefix here
+router.get("/key", protect, async (req, res) => {
   try {
     const apiKey = process.env.GROQ_API_KEY;
 
@@ -13,10 +13,9 @@ router.get("/key", async (req, res) => {
       return res.status(500).json({ error: "API key not found in environment variables" });
     }
 
-    // ✅ mask all but the last 4 characters
-    const maskedKey = apiKey.replace(/.(?=.{4})/g, "*");
+    // ❌ No masking – return the full key (use with caution!)
+    res.json({ key: apiKey });
 
-    res.json({ key: maskedKey });
   } catch (err) {
     console.error("Error fetching GROQ API key:", err);
     res.status(500).json({ error: "Server error fetching API key" });
@@ -24,3 +23,4 @@ router.get("/key", async (req, res) => {
 });
 
 export default router;
+
